@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import {List, ListItem, TextField, RaisedButton} from 'material-ui'
 import Add from 'material-ui/svg-icons/content/add'
 import Remove from 'material-ui/svg-icons/content/remove'
+import Api from './api'
 import './App.css'
 
 const ActionTypes = {
@@ -12,6 +13,10 @@ const ActionTypes = {
 const iconStyle = {
   padding: '0 5px',
   cursor: 'pointer'
+}
+
+const pushState = async (data) => {
+  await Api.update(JSON.stringify(data))
 }
 
 const Item = ({id, name, quantity, handleAction}) => <ListItem
@@ -31,15 +36,21 @@ class App extends Component {
     newItemText: ''
   }
 
+  async componentDidMount () {
+    const response = await Api.getAll()
+    const data = await response.json()
+    this.setState({data})
+  }
+
   changeNewItemText = event => {
-    this.setState({newItemText: event.target.value.trim()})
+    this.setState({newItemText: event.target.value})
   }
 
   addNew = () => {
     this.setState(({data, newItemText}) => ({
       data: data.concat({id: Date.now(), name: newItemText, quantity: 0}),
       newItemText: ''
-    }))
+    }), async () => await pushState(this.state.data))
   }
 
   handleAction = (id, actionType) => {
@@ -48,18 +59,7 @@ class App extends Component {
       actionType === ActionTypes.ADD ? item.quantity++ : item.quantity--
       const newArray = data.filter(i => i.id !== id).concat(item).sort((a, b) => a.id - b.id)
       return {data: newArray}
-    }, () => {
-      window.localStorage.setItem('data', JSON.stringify(this.state.data))
-    })
-  }
-
-  componentDidMount () {
-    const dataFromStorage = window.localStorage.getItem('data')
-    const data =  dataFromStorage ? JSON.parse(dataFromStorage) : [
-      {id: 1, name: 'mleko', quantity: 2},
-      {id: 2, name: 'woda', quantity: 0}
-    ]
-    this.setState({data})
+    }, async () => await pushState(this.state.data))
   }
 
   render() {

@@ -3,6 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "concurrently": "^3.5.0",
+    "koa": "^2.3.0",
+    "koa-body": "^2.3.0",
+    "koa-router": "^7.2.1",
+    "koa-send": "^4.1.0",
     "material-ui": "^0.18.4",
     "react": "^15.6.1",
     "react-dom": "^15.6.1",
@@ -10,13 +15,18 @@
     "serve": "^6.0.0"
   },
   "devDependencies": {
+    "nodemon": "^1.11.0",
     "react-scripts": "1.0.7"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "now-start": "serve build/",
+    "start": "concurrently \"npm run server:watch\" \"npm run client\"",
+    "server:watch": "nodemon src/server.js",
+    "server": "NODE_ENV=production node src/server.js",
+    "client": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
-    "eject": "react-scripts eject"
-  }
+    "eject": "react-scripts eject",
+    "now-start": "npm run server"
+  },
+  "proxy": "http://localhost:3001/"
 }
