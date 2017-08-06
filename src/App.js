@@ -2,16 +2,18 @@ import React, { Component } from 'react'
 import {List, ListItem, TextField, RaisedButton} from 'material-ui'
 import Add from 'material-ui/svg-icons/content/add'
 import Remove from 'material-ui/svg-icons/content/remove'
+import Delete from 'material-ui/svg-icons/action/delete'
 import Api from './api'
 import './App.css'
 
 const ActionTypes = {
   ADD: 'ADD',
-  REMOVE: 'REMOVE'
+  REMOVE: 'REMOVE',
+  DELETE: 'DELETE'
 }
 
 const iconStyle = {
-  padding: '0 5px',
+  padding: '0 10px',
   cursor: 'pointer'
 }
 
@@ -27,6 +29,7 @@ const Item = ({id, name, quantity, handleAction}) => <ListItem
   >
     <Add style={iconStyle} onClick={() => handleAction(id, ActionTypes.ADD)} />
     <Remove style={iconStyle} onClick={() => handleAction(id, ActionTypes.REMOVE)} />
+    <Delete style={iconStyle} onClick={() => handleAction(id, ActionTypes.DELETE)} />
   </div>
 </ListItem>
 
@@ -55,10 +58,27 @@ class App extends Component {
 
   handleAction = (id, actionType) => {
     this.setState(({data}) => {
-      const item = data.filter(i => i.id === id)[0]
-      actionType === ActionTypes.ADD ? item.quantity++ : item.quantity--
-      const newArray = data.filter(i => i.id !== id).concat(item).sort((a, b) => a.id - b.id)
-      return {data: newArray}
+      let item = data.filter(i => i.id === id)[0]
+
+      switch (actionType) {
+        case ActionTypes.ADD:
+          item.quantity++
+          break
+        case ActionTypes.REMOVE:
+          item.quantity--
+          break
+        default:
+          item = null
+          break
+      }
+
+      const newArray = data
+        .filter(i => i.id !== id)
+        .concat(item)
+        .filter(i => i)
+        .sort((a, b) => a.id - b.id)
+
+        return {data: newArray}
     }, async () => await pushState(this.state.data))
   }
 
