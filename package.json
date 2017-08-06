@@ -9,6 +9,7 @@
     "koa-router": "^7.2.1",
     "koa-send": "^4.1.0",
     "material-ui": "^0.18.4",
+    "mongoose": "^4.11.5",
     "react": "^15.6.1",
     "react-dom": "^15.6.1",
     "react-tap-event-plugin": "^2.0.1",
@@ -20,7 +21,7 @@
   },
   "scripts": {
     "start": "concurrently \"npm run server:watch\" \"npm run client\"",
-    "server:watch": "nodemon src/server.js",
+    "server:watch": "DATABASE=mongodb://localhost:27017/test nodemon src/server.js",
     "server": "NODE_ENV=production node src/server.js",
     "client": "react-scripts start",
     "build": "react-scripts build",

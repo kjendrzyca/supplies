@@ -6,34 +6,62 @@ const sendStatic = require('koa-send')
 const router = require('koa-router')({
   prefix: '/api'
 })
+const mongoose = require('mongoose')
+mongoose.Promise = global.Promise
+const DataSchema = require('./db').dataSchema
 
 const globals = {
+  dbConnectionString: process.env.DATABASE,
   isProduction: process.env.NODE_ENV === 'production'
 }
-
-let data = [
-  {id: 1, name: 'mleko', quantity: 2},
-  {id: 2, name: 'woda', quantity: 0}
-]
 
 const log = {
   error: (...args) => console.error(...args),
   info: (...args) => console.log(...args)
 }
+
+mongoose.connect(globals.dbConnectionString, () => {
+  if (globals.isProduction) {
+    return
+  }
+  mongoose.connection.db.dropDatabase()
+})
+const Data = mongoose.model('Data', DataSchema)
+mongoose.connection.on('error', console.error.bind(console, 'connection error:'))
+mongoose.connection.once('open', function() {
+  log.info('connected!')
+})
+
 app.on('error', (error, ctx) => {
   log.error('server error', error, ctx)
 })
 
 router.get('/', async (ctx, next) => {
+  const dataFromDb = await Data.find()
   ctx.status = 200
-  ctx.body = data
+  ctx.body = dataFromDb.length ? JSON.parse(dataFromDb[0].data) : []
   await next()
 })
 
 router.post('/', async (ctx, next) => {
   log.info('BODY', ctx.request.body)
-  data = ctx.request.body
-  ctx.status = 200
+
+  const allDataFromDb = await Data.find()
+
+  if (allDataFromDb.length) {
+    const dataFromDb = allDataFromDb[0]
+    dataFromDb.data = JSON.stringify(ctx.request.body)
+    await dataFromDb.save()
+    ctx.status = 204
+  } else {
+    const created = new Data({
+      data: JSON.stringify(ctx.request.body)
+    })
+
+    await created.save()
+    ctx.status = 201
+  }
+
   await next()
 })
 
