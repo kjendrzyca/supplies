@@ -9,11 +9,10 @@ import './index.css'
 
 injectTapEventPlugin()
 
-const Root = () => (
+const Root = () =>
   <MuiThemeProvider>
     <App />
   </MuiThemeProvider>
-)
 
 ReactDOM.render(<Root />, document.getElementById('root'))
 registerServiceWorker()

@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, {Component} from 'react'
 import {List, ListItem, TextField, RaisedButton} from 'material-ui'
 import Add from 'material-ui/svg-icons/content/add'
 import Remove from 'material-ui/svg-icons/content/remove'
@@ -9,37 +9,43 @@ import './App.css'
 const ActionTypes = {
   ADD: 'ADD',
   REMOVE: 'REMOVE',
-  DELETE: 'DELETE'
+  DELETE: 'DELETE',
 }
 
 const iconStyle = {
   padding: '0 10px',
-  cursor: 'pointer'
+  cursor: 'pointer',
 }
 
-const pushState = async (data) => {
+const pushState = async data => {
   await Api.update(JSON.stringify(data))
 }
 
-const Item = ({id, name, quantity, handleAction}) => <ListItem
-  primaryText={`${name}: ${quantity}`}
->
-  <div
-    style={{position: 'absolute', right: '10px'}}
-  >
-    <Add style={iconStyle} onClick={() => handleAction(id, ActionTypes.ADD)} />
-    <Remove style={iconStyle} onClick={() => handleAction(id, ActionTypes.REMOVE)} />
-    <Delete style={iconStyle} onClick={() => handleAction(id, ActionTypes.DELETE)} />
-  </div>
-</ListItem>
+const Item = ({id, name, quantity, handleAction}) =>
+  <ListItem primaryText={`${name}: ${quantity}`}>
+    <div style={{position: 'absolute', right: '10px'}}>
+      <Add
+        style={iconStyle}
+        onClick={() => handleAction(id, ActionTypes.ADD)}
+      />
+      <Remove
+        style={iconStyle}
+        onClick={() => handleAction(id, ActionTypes.REMOVE)}
+      />
+      <Delete
+        style={iconStyle}
+        onClick={() => handleAction(id, ActionTypes.DELETE)}
+      />
+    </div>
+  </ListItem>
 
 class App extends Component {
   state = {
     data: [],
-    newItemText: ''
+    newItemText: '',
   }
 
-  async componentDidMount () {
+  async componentDidMount() {
     const response = await Api.getAll()
     const data = await response.json()
     this.setState({data})
@@ -50,10 +56,13 @@ class App extends Component {
   }
 
   addNew = () => {
-    this.setState(({data, newItemText}) => ({
-      data: data.concat({id: Date.now(), name: newItemText, quantity: 0}),
-      newItemText: ''
-    }), async () => await pushState(this.state.data))
+    this.setState(
+      ({data, newItemText}) => ({
+        data: data.concat({id: Date.now(), name: newItemText, quantity: 0}),
+        newItemText: '',
+      }),
+      async () => await pushState(this.state.data),
+    )
   }
 
   handleAction = (id, actionType) => {
@@ -78,7 +87,7 @@ class App extends Component {
         .filter(i => i)
         .sort((a, b) => a.id - b.id)
 
-        return {data: newArray}
+      return {data: newArray}
     }, async () => await pushState(this.state.data))
   }
 
@@ -94,7 +103,9 @@ class App extends Component {
           <RaisedButton label="ADD" primary onClick={this.addNew} />
         </div>
         <List>
-          {this.state.data.map(data => <Item handleAction={this.handleAction} key={data.id} {...data} />)}
+          {this.state.data.map(data =>
+            <Item handleAction={this.handleAction} key={data.id} {...data} />,
+          )}
         </List>
       </div>
     )

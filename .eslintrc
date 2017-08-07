@@ -1,6 +1,18 @@
 {
-  "extends": "react-app",
+  "extends": [
+    "react-app",
+    "prettier"
+  ],
+  "plugins": [
+    "prettier"
+  ],
   "rules": {
-    "semi": ["error", "never"]
+    "semi": ["error", "never"],
+    "prettier/prettier": ["error", {
+      "semi": false,
+      "singleQuote": true,
+      "trailingComma": "all",
+      "bracketSpacing": false
+    }]
   }
 }

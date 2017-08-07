@@ -4,7 +4,7 @@ const app = new Koa()
 const bodyParser = require('koa-body')
 const sendStatic = require('koa-send')
 const router = require('koa-router')({
-  prefix: '/api'
+  prefix: '/api',
 })
 const mongoose = require('mongoose')
 mongoose.Promise = global.Promise
@@ -12,12 +12,12 @@ const DataSchema = require('./db').dataSchema
 
 const globals = {
   dbConnectionString: process.env.DATABASE,
-  isProduction: process.env.NODE_ENV === 'production'
+  isProduction: process.env.NODE_ENV === 'production',
 }
 
 const log = {
   error: (...args) => console.error(...args),
-  info: (...args) => console.log(...args)
+  info: (...args) => console.log(...args),
 }
 
 mongoose.connect(globals.dbConnectionString, () => {
@@ -27,7 +27,10 @@ mongoose.connect(globals.dbConnectionString, () => {
   mongoose.connection.db.dropDatabase()
 })
 const Data = mongoose.model('Data', DataSchema)
-mongoose.connection.on('error', console.error.bind(console, 'connection error:'))
+mongoose.connection.on(
+  'error',
+  console.error.bind(console, 'connection error:'),
+)
 mongoose.connection.once('open', function() {
   log.info('connected!')
 })
@@ -55,7 +58,7 @@ router.post('/', async (ctx, next) => {
     ctx.status = 204
   } else {
     const created = new Data({
-      data: JSON.stringify(ctx.request.body)
+      data: JSON.stringify(ctx.request.body),
     })
 
     await created.save()
@@ -77,7 +80,7 @@ if (globals.isProduction) {
     }
     await sendStatic(ctx, ctx.path, {
       root: staticPath,
-      index: 'index.html'
+      index: 'index.html',
     })
   })
 }
